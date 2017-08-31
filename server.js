@@ -1,6 +1,10 @@
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var config = require('./webpack.config');
+const webpack = require('webpack');
+const WebpackDevServer = require('webpack-dev-server');
+const config = require('./webpack.config');
+const opn = require('opn');
+
+let port = 8080;
+let uri =  'http://localhost:'+port;
 
 new WebpackDevServer(webpack(config), {
     publicPath: config.output.publicPath,
@@ -21,10 +25,15 @@ new WebpackDevServer(webpack(config), {
       chunks: false,
       chunkModules: false
     }
-}).listen(3000, 'localhost', function (err) {
+}).listen(port, 'localhost', function (err) {
     if (err) {
         console.log(err);
     }
 
-  console.log('Listening at localhost:3000');
+  console.log('Listening at '+ uri);
+
+    setTimeout(() => {
+        opn(uri);
+    }, 3000);
+
 });
