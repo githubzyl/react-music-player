@@ -1,39 +1,41 @@
+/*eslint no-console:0 */
+'use strict';
+require('core-js/fn/object/assign');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const config = require('./webpack.config');
+const open = require('open');
 const opn = require('opn');
 
-let port = 8080;
-let uri =  'http://localhost:'+port;
+/**
+ * Flag indicating whether webpack compiled for the first time.
+ * @type {boolean}
+ */
+let isInitialCompilation = true;
 
-new WebpackDevServer(webpack(config), {
-    publicPath: config.output.publicPath,
-    hot: true,
-    historyApiFallback: true,
-    // It suppress error shown in console, so it has to be set to false.
-    quiet: false,
-    // It suppress everything except error, so it has to be set to false as well
-    // to see success build.
-    noInfo: false,
-    stats: {
-      // Config for minimal console.log mess.
-      assets: false,
-      colors: true,
-      version: false,
-      hash: false,
-      timings: false,
-      chunks: false,
-      chunkModules: false
-    }
-}).listen(port, 'localhost', function (err) {
-    if (err) {
-        console.log(err);
-    }
+const compiler = webpack(config);
 
-  console.log('Listening at '+ uri);
+new WebpackDevServer(compiler, config.devServer)
+.listen(config.port, 'localhost', (err) => {
+  if (err) {
+    console.log(err);
+  }
+  console.log('Listening at localhost:' + config.port);
+});
 
+let uri = 'http://localhost:' + config.port + '/webpack-dev-server/';
+
+compiler.plugin('done', () => {
+  if (isInitialCompilation) {
+    // Ensures that we log after webpack printed its stats (is there a better way?)
     setTimeout(() => {
-        opn(uri);
-    }, 3000);
+      console.log('\n✓ The bundle is now ready for serving!\n');
+      console.log('  Open in iframe mode:\t\x1b[33m%s\x1b[0m',  'http://localhost:' + config.port + '/webpack-dev-server/');
+      console.log('  Open in inline mode:\t\x1b[33m%s\x1b[0m', 'http://localhost:' + config.port + '/\n');
+      console.log('  \x1b[33mHMR is active\x1b[0m. The bundle will automatically rebuild and live-update on changes.')
+    }, 350);
 
+    opn(uri);
+  }
+  isInitialCompilation = false;
 });
