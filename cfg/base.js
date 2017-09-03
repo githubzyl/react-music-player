@@ -7,7 +7,9 @@ let defaultSettings = require('./defaults');
 // @example:
 // let npmBase = path.join(__dirname, '../node_modules');
 // let additionalPaths = [ path.join(npmBase, 'react-bootstrap') ];
-let additionalPaths = [];
+let imagesBase = path.join(__dirname, '../src/images');
+let cssBase = path.join(__dirname, '../src/styles/css');
+let additionalPaths = [imagesBase,cssBase];
 
 module.exports = {
   additionalPaths: additionalPaths,
@@ -17,7 +19,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, '/../dist/assets'),
     filename: 'app.js',
-    publicPath: defaultSettings.publicPath
+    publicPath: defaultSettings.publicPath.substring(1)
   },
   devServer: {
     contentBase: './src/',
